@@ -1,80 +1,66 @@
-
-// Imports
 import java.awt.GridLayout;
 import java.awt.Color;
 import java.awt.Image;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.border.LineBorder;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-// Main class extends JPanel (swing)
 public class TikTakToeGUI extends JPanel {
-  // Instance variables
-  char playerSign = 'X';
-  int cells = 9;
-  int rows = 3;
-  int columns = 3;
-  JButton[] btns = new JButton[cells];
+  char playerSign = 'O';
+  int totalCells = 9;
+  int totalRows = 3;
+  int totalColumns = 3;
+  JButton[] jButtons = new JButton[totalCells];
 
-  // Main constructor of the class
   public TikTakToeGUI() {
-    // Create a new grid for tic-tac-toe
-    GridLayout ticTacToeGridLayout = new GridLayout(rows, columns);
+    GridLayout ticTacToeGridLayout = new GridLayout(totalRows, totalColumns);
     setLayout(ticTacToeGridLayout);
+
     createButtons();
   }
 
-  // createButtons() method
   public void createButtons() {
-    // For loop that creates each of the nine buttons
-    for (int i = 0; i < cells; i++) {
+    for (int i = 0; i <= 8; i++) {
       JButton btn = new JButton();
       btn.setBackground(Color.WHITE);
-      btn.setBorder(new LineBorder(Color.BLACK));
-      btns[i] = btn;
+      jButtons[i] = btn;
 
-      btns[i].setText("");
+      jButtons[i].setText("");
 
-      btns[i].addActionListener(e -> {
-        JButton btnClicked = (JButton) e.getSource();
-        btnClicked.setBackground(Color.BLACK);
-        btnClicked.setForeground(Color.WHITE);
-        btnClicked.setBorder(new LineBorder(Color.WHITE));
-        btnClicked.setText(String.valueOf(playerSign));
-        /*
-         * try {
-         * Image img = (playerSign == 'X') ?
-         * ImageIO.read(getClass().getResource("X.png")) :
-         * ImageIO.read(getClass().getResource("O.jpg"));
-         * clickedBtn.setIcon(new ImageIcon(img));
-         * } catch (Exception ex) {
-         * System.out.println(ex);
-         * }
-         **/
-        btnClicked.setEnabled(false);
+      jButtons[i].addActionListener(e -> {
+        JButton clickedBtn = (JButton) e.getSource();
+        clickedBtn.setBackground(Color.BLACK);
+        clickedBtn.setForeground(Color.WHITE);
+        clickedBtn.setText(String.valueOf(playerSign));
+        /**try {
+          Image img = (playerSign == 'O') ? ImageIO.read(getClass().getResource("X.png")) : ImageIO.read(getClass().getResource("O.jpg"));
+          clickedBtn.setIcon(new ImageIcon(img));
+        } catch (Exception ex) {
+          System.out.println(ex);
+        }**/
+        clickedBtn.setEnabled(false);
 
-        if (playerSign == 'X')
-          playerSign = 'O';
-        else
+        if (playerSign == 'O')
           playerSign = 'X';
+        else
+          playerSign = 'O';
 
         showWinner();
       });
 
-      add(btns[i]);
+      add(jButtons[i]);
     }
   }
 
   public void showWinner() {
-    if (existsWinner()) {
-      if (playerSign == 'X')
-        playerSign = 'O';
+    if (checkForWinner()) {
+      if (playerSign == 'O')
+        playerSign = 'X';
       else
-        playerSign = 'x';
+        playerSign = 'O';
 
       JOptionPane jOptionPane = new JOptionPane();
       int dialog = JOptionPane.showConfirmDialog(jOptionPane,
@@ -85,7 +71,7 @@ public class TikTakToeGUI extends JPanel {
       if (dialog == JOptionPane.OK_OPTION)
         System.exit(0);
 
-    } else if (isDraw()) {
+    } else if (checkIfMatchDraw()) {
       JOptionPane jOptionPane = new JOptionPane();
       int dialog = JOptionPane.showConfirmDialog(
           jOptionPane, "Game Draw", "Result", JOptionPane.DEFAULT_OPTION);
@@ -95,26 +81,26 @@ public class TikTakToeGUI extends JPanel {
     }
   }
 
-  public boolean isDraw() {
+  public boolean checkIfMatchDraw() {
     boolean gridsFull = true;
-    for (int i = 0; i < cells; i++) {
-      if (btns[i].getText().equals("")) {
+    for (int i = 0; i < totalCells; i++) {
+      if (jButtons[i].getText().equals("")) {
         gridsFull = false;
       }
     }
     return gridsFull;
   }
 
-  public boolean existsWinner() {
-    return checkRows() || checkColumns() || checkDiagonals();
+  public boolean checkForWinner() {
+    return checkAllRows() || checkAllColumns() || checkTheDiagonals();
   }
 
-  public boolean checkRows() {
+  public boolean checkAllRows() {
     int i = 0;
     for (int j = 0; j < 3; j++) {
-      if (btns[i].getText().equals(btns[i + 1].getText())
-          && btns[i].getText().equals(btns[i + 2].getText())
-          && !btns[i].getText().equals("")) {
+      if (jButtons[i].getText().equals(jButtons[i + 1].getText())
+          && jButtons[i].getText().equals(jButtons[i + 2].getText())
+          && !jButtons[i].getText().equals("")) {
         return true;
       }
       i = i + 3;
@@ -122,12 +108,12 @@ public class TikTakToeGUI extends JPanel {
     return false;
   }
 
-  public boolean checkColumns() {
+  public boolean checkAllColumns() {
     int i = 0;
     for (int j = 0; j < 3; j++) {
-      if (btns[i].getText().equals(btns[i + 3].getText())
-          && btns[i].getText().equals(btns[i + 6].getText())
-          && !btns[i].getText().equals("")) {
+      if (jButtons[i].getText().equals(jButtons[i + 3].getText())
+          && jButtons[i].getText().equals(jButtons[i + 6].getText())
+          && !jButtons[i].getText().equals("")) {
         return true;
       }
       i++;
@@ -135,23 +121,23 @@ public class TikTakToeGUI extends JPanel {
     return false;
   }
 
-  public boolean checkDiagonals() {
-    if (btns[0].getText().equals(btns[4].getText())
-        && btns[0].getText().equals(btns[8].getText()) && !btns[0].getText().equals(""))
+  public boolean checkTheDiagonals() {
+    if (jButtons[0].getText().equals(jButtons[4].getText())
+        && jButtons[0].getText().equals(jButtons[8].getText()) && !jButtons[0].getText().equals(""))
       return true;
     else
-      return btns[2].getText().equals(btns[4].getText())
-          && btns[2].getText().equals(btns[6].getText())
-          && !btns[2].getText().equals("");
+      return jButtons[2].getText().equals(jButtons[4].getText())
+          && jButtons[2].getText().equals(jButtons[6].getText())
+          && !jButtons[2].getText().equals("");
   }
 
   public static void main(String[] args) {
-    JFrame frame = new JFrame("Tic Tac Toe Game");
+    JFrame jFrame = new JFrame("Tic Tac Toe Game");
 
-    frame.getContentPane().add(new TikTakToeGUI());
-    frame.setBounds(500, 500, 600, 550);
-    frame.setVisible(true);
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setLocationRelativeTo(null);
+    jFrame.getContentPane().add(new TikTakToeGUI());
+    jFrame.setBounds(500, 500, 600, 550);
+    jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    jFrame.setVisible(true);
+    jFrame.setLocationRelativeTo(null);
   }
 }
